@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For My Chui Mui | Ishita</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root { --heart-red: #ff4d6d; --gold: #D4AF37; --soft-pink: #ffb7c5; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: #000; overflow: hidden; height: 100%; color: #fff; }
+
+        /* OPTIMIZED BACKGROUND */
+        #star-container { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; }
+
+        /* SCREENS & TRANSITIONS */
+        .page { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10; text-align: center; padding: 25px; transition: opacity 0.5s ease; }
+        .active { display: flex; }
+
+        .cursive { font-family: 'Great Vibes', cursive; color: var(--soft-pink); text-shadow: 0 0 15px rgba(255,183,197,0.3); }
+        .glass-card { background: rgba(255, 255, 255, 0.07); backdrop-filter: blur(15px); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 350px; }
+
+        #pass-input { background: transparent; border: none; border-bottom: 2px solid var(--gold); color: var(--gold); font-size: 1.8rem; text-align: center; outline: none; width: 180px; font-family: 'Great Vibes'; margin-top: 20px; }
+
+        .btn { background: var(--heart-red); color: white; border: none; padding: 12px 35px; border-radius: 50px; font-weight: 600; cursor: pointer; margin-top: 20px; box-shadow: 0 5px 15px rgba(255,77,109,0.3); }
+
+        /* PHOTO SECTION */
+        .polaroid { width: 260px; height: 320px; background: white; padding: 10px; padding-bottom: 45px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: rotate(-2deg); margin-bottom: 20px; }
+        .polaroid img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* MATCHSTICK */
+        #matchstick { width: 90px; height: 7px; background: #5d2e0a; position: absolute; cursor: grab; border-radius: 4px; z-index: 100; left: 50%; bottom: 15%; transform: translateX(-50%); }
+        #match-head { width: 16px; height: 12px; background: #4a0000; position: absolute; right: -5px; top: -3px; border-radius: 50%; }
+
+        /* OVERLAYS */
+        #flash-word { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'Great Vibes'; font-size: 7rem; color: var(--gold); z-index: 5000; pointer-events: none; opacity: 0; text-shadow: 0 0 30px var(--gold); }
+        #ripple { position: fixed; top: 50%; left: 50%; width: 0; height: 0; background: var(--heart-red); border-radius: 50%; z-index: 4000; transform: translate(-50%, -50%); pointer-events: none; opacity: 0; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop preload="auto"><source src="music.mp3" type="audio/mpeg"></audio>
+    <div id="star-container"></div>
+    <div id="flash-word"></div>
+    <div id="ripple"></div>
+
+    <div id="page0" class="page active" style="background: #000; z-index: 5000;">
+        <h1 class="cursive" style="font-size: 3rem;">For Chui Mui</h1>
+        <input type="text" id="pass-input" placeholder="Birthday Date..." autocomplete="off">
+    </div>
+
+    <div id="page-intro" class="page">
+        <h2 id="intro-text" class="cursive" style="font-size: 2.8rem; line-height: 1.2;"></h2>
+    </div>
+
+    <div id="page1" class="page">
+        <h1 class="cursive" style="font-size: 5rem; margin:0;">For Ishita</h1>
+        <p class="cursive" style="font-size: 1.8rem;">A magical journey... 🌸</p>
+        <button class="btn" onclick="nav(2)">START ✨</button>
+    </div>
+
+    <div id="page2" class="page">
+        <div class="glass-card">
+            <h1 class="cursive">A Cutie was born...</h1>
+            <p style="font-size: 0.9rem; line-height: 1.6;">Exactly <b style="color:var(--gold)">16 years ago</b>, the most cutest person was born for luckyyyyy my soft hearted sensitive bachi! Enjoy this little efforts from your gadha!</p>
+            <button class="btn" onclick="nav(3)">Aage Dekho ❤️</button>
+        </div>
+    </div>
+
+    <div id="page3" class="page">
+        <h2 class="cursive">Jalao & Wish Maango!</h2>
+        <div id="cake-display" style="font-size: 100px; margin: 20px; filter: grayscale(1);">🎂</div>
+        <div id="strike-zone" style="width:120px; height:60px; border:2px dashed var(--gold); border-radius:10px; margin-bottom:100px; display:flex; align-items:center; justify-content:center; font-size:10px;">STRIKE HERE</div>
+        <div id="matchstick"><div id="match-head"></div></div>
+        
+        <div id="cake-actions" style="display:none;">
+            <button class="btn" onclick="blowCake()">Blow & Wish! 🎂</button>
+        </div>
+        <div id="cake-final" style="display:none;">
+            <h2 class="cursive" style="font-size: 2.5rem;">Happy Birthday baby!</h2>
+            <button class="btn" onclick="nav(4)">Next Surprise ✨</button>
+        </div>
+    </div>
+
+    <div id="page4" class="page">
+        <h2 class="cursive">Our destiny is connected...</h2>
+        <div id="laser-dot" style="width:15px; height:15px; background:var(--gold); border-radius:50%; box-shadow:0 0 20px var(--gold);"></div>
+        <button id="l-btn" class="btn" onclick="runLasers()">Reveal the Bond ✨</button>
+        <div id="l-res" style="display:none;">
+            <h1 class="cursive" style="font-size: 3rem;">I LOVE YOU CHUI MUI</h1>
+            <button class="btn" onclick="nav(5)">Your Letter ❤️</button>
+        </div>
+    </div>
+
+    <div id="page5" class="page">
+        <div id="env" class="glass-card" style="cursor:pointer; padding:50px;" onclick="openEnv()">
+            <div style="font-size:50px;">✉️</div>
+            <p>Tap to Open</p>
+        </div>
+        <div id="letter-box" class="glass-card" style="display:none; text-align:left;">
+            <h2 class="cursive" style="text-align:center;">Meri Pyari Ishita ❤️</h2>
+            <div id="write" style="font-size:0.85rem; line-height:1.6; max-height:300px; overflow-y:auto;"></div>
+            <button id="l-next" class="btn" style="display:none; width:100%;" onclick="nav(6)">Photos 📸</button>
+        </div>
+    </div>
+
+    <div id="page6" class="page">
+        <div class="polaroid" id="photo-box">
+            <img id="g-img" src="photo1.jpg">
+        </div>
+        <p id="g-count" style="font-size:12px; letter-spacing:2px;">PHOTO 1 OF 6</p>
+        <button id="g-btn" class="btn" onclick="stepGallery()">Lucky</button>
+        <button id="g-fin" class="btn" style="display:none;" onclick="nav(7)">The End ❤️</button>
+    </div>
+
+    <div id="page7" class="page">
+        <div class="glass-card">
+            <h1 class="cursive" style="font-size: 4rem;">The End ❤️</h1>
+            <p style="font-size:0.8rem;">I hope ye dekh kar tum smile kar rahi hogi. You deserve the whole world. Mwah! 💋</p>
+            <h2 class="cursive">I Love You Forever</h2>
+        </div>
+    </div>
+
+    <script>
+        // BACKGROUND STARS (REDUCED FOR PERFORMANCE)
+        const container = document.getElementById('star-container');
+        for(let i=0; i<80; i++) {
+            const s = document.createElement('div');
+            s.className = 'star';
+            let size = Math.random()*2+1 + 'px';
+            s.style.width = size; s.style.height = size;
+            s.style.left = Math.random()*100+'vw'; s.style.top = Math.random()*100+'vh';
+            container.appendChild(s);
+        }
+
+        // PASS LOGIC
+        document.getElementById('pass-input').addEventListener('input', function(e) {
+            if(this.value.toLowerCase() === "16 april") {
+                document.getElementById('bgMusic').play().catch(()=>{});
+                gsap.to("#page0", { opacity: 0, duration: 0.8, onComplete: () => {
+                    document.getElementById('page0').style.display='none';
+                    startIntro();
+                }});
+            }
+        });
+
+        // INTRO
+        function startIntro() {
+            const intro = document.getElementById('page-intro');
+            intro.style.display = 'flex';
+            gsap.to(intro, { opacity: 1 });
+            
+            const txt = document.getElementById('intro-text');
+            gsap.to(txt, { duration: 2, text: "I searched the whole world...", ease: "none" });
+            setTimeout(() => {
+                gsap.to(txt, { opacity: 0, duration: 0.5, onComplete: () => {
+                    txt.innerText = "But I found my universe in you.";
+                    gsap.to(txt, { opacity: 1, duration: 1 });
+                }});
+            }, 3000);
+            setTimeout(() => nav(1), 6000);
+        }
+
+        // SMOOTH NAVIGATION
+        function nav(num) {
+            const rip = document.getElementById('ripple');
+            gsap.set(rip, { width: 0, height: 0, opacity: 1 });
+            gsap.to(rip, { width: "300vw", height: "300vw", duration: 0.7, ease: "power2.in", onComplete: () => {
+                document.querySelectorAll('.page').forEach(p => { p.style.display='none'; p.classList.remove('active'); });
+                const next = document.getElementById('page'+num);
+                if(!next) document.getElementById('page1').style.display='flex';
+                else { next.style.display='flex'; next.classList.add('active'); }
+                gsap.to(rip, { opacity: 0, duration: 0.5 });
+            }});
+        }
+
+        // MATCHSTICK CAKE
+        const st = document.getElementById('matchstick');
+        let lit = false;
+        st.addEventListener('touchmove', function(e) {
+            let t = e.touches[0];
+            st.style.left = t.pageX + 'px'; st.style.top = t.pageY + 'px';
+            const zone = document.getElementById('strike-zone').getBoundingClientRect();
+            if(t.pageX > zone.left && t.pageX < zone.right && t.pageY > zone.top && t.pageY < zone.bottom && !lit) {
+                lit = true;
+                document.getElementById('match-head').style.background = "orange";
+                document.getElementById('cake-display').style.filter = "none";
+                document.getElementById('cake-actions').style.display = 'block';
+            }
+        });
+
+        function blowCake() {
+            confetti({ particleCount: 150, spread: 60 });
+            document.getElementById('cake-actions').style.display = 'none';
+            document.getElementById('cake-final').style.display = 'block';
+        }
+
+        // LASERS
+        function runLasers() {
+            document.getElementById('l-btn').style.display='none';
+            setTimeout(() => {
+                document.getElementById('l-res').style.display='block';
+                confetti({ particleCount: 50, colors: ['#D4AF37'] });
+            }, 1000);
+        }
+
+        // LETTER
+        function openEnv() {
+            document.getElementById('env').style.display='none';
+            document.getElementById('letter-box').style.display='block';
+            const msg = `So meri pyari si jaanu chui mui, this was my little efforts ekdam thodese and bare minimum... I love youuuuu sooo much! You're my everything. This birthday is so so special for ussss.<br><br>This is your first birthday mere sath relationship me aane baad, i hope next 80 saal tak sare birthday sathme manaye ham. I can't live without you. I'll do everything for you meri bachi, literally best ho tum, my dream girl and my everything.<br><br>Even family maane ya na maane but mai hamesha tumhare sath rahunga forever. I can leave anyone for you. Pata h i was so shocked ki tumhe harsh aisa treat kra tha toh ha I'll do ya ek chij that you deserved and mai bare minimum bar bar isliye kehta rehta because you deserve the world meri jaan 🥰🥰`;
+            let i = 0;
+            function type() {
+                if(i < msg.length) {
+                    document.getElementById('write').innerHTML = msg.substring(0, i+1);
+                    i++; setTimeout(type, 30);
+                } else { document.getElementById('l-next').style.display='block'; }
+            }
+            type();
+        }
+
+        // ACCURATE GALLERY FLOW
+        let gStep = 1;
+        const bText = ["Love", "Me", "More", "🥰😝"];
+        const fText = ["I", "Love", "You", "So", "More"];
+
+        function stepGallery() {
+            const f = document.getElementById('flash-word');
+            f.innerText = fText[gStep-1];
+            gsap.fromTo(f, { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1.2, duration: 0.4, onComplete: () => {
+                gsap.to(f, { opacity: 0, scale: 2, duration: 0.3 });
+            }});
+
+            gsap.to("#photo-box", { opacity: 0, x: 50, duration: 0.3, onComplete: () => {
+                gStep++;
+                document.getElementById('g-img').src = `photo${gStep}.jpg`;
+                document.getElementById('g-count').innerText = `PHOTO ${gStep} OF 6`;
+                gsap.to("#photo-box", { opacity: 1, x: 0, duration: 0.3 });
+                
+                if(gStep <= 5) document.getElementById('g-btn').innerText = bText[gStep-2];
+                else {
+                    document.getElementById('g-btn').style.display='none';
+                    document.getElementById('g-fin').style.display='block';
+                }
+            }});
+        }
+    </script>
+</body>
+  </html>
+  
