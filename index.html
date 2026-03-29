@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Chui Mui | Ishita</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root { --heart-red: #ff4d6d; --soft-pink: #ffb7c5; --gold: #D4AF37; }
+        body, html { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: #000; overflow: hidden; height: 100vh; color: #fff; }
+
+        /* STARS & PARTICLES */
+        #star-container { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; box-shadow: 0 0 5px #fff; }
+
+        /* SCREENS */
+        .page { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10; text-align: center; padding: 20px; opacity: 0; }
+        .active { display: flex; opacity: 1; }
+
+        #pass-screen { z-index: 2000; background: #050505; }
+        #pass-input { background: transparent; border: none; border-bottom: 2px solid var(--gold); color: var(--gold); font-size: 2rem; text-align: center; outline: none; width: 250px; font-family: 'Great Vibes'; }
+
+        .cursive { font-family: 'Great Vibes', cursive; color: var(--soft-pink); text-shadow: 0 0 10px rgba(255,183,197,0.4); }
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); padding: 40px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); max-width: 500px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+
+        /* BUTTONS */
+        .peak-btn { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--gold); padding: 15px 40px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: 0.4s; letter-spacing: 2px; }
+        .peak-btn:hover { background: var(--heart-red); border-color: var(--soft-pink); transform: scale(1.1); box-shadow: 0 0 20px var(--heart-red); }
+
+        /* PHOTO FRAME - POLAROID ROYAL */
+        .photo-container { position: relative; width: 280px; height: 350px; background: #fff; padding: 12px; padding-bottom: 60px; box-shadow: 0 15px 50px rgba(0,0,0,0.8); transform: rotate(-3deg); }
+        .photo-container img { width: 100%; height: 100%; object-fit: cover; filter: sepia(0.2); }
+
+        /* MATCHSTICK */
+        #matchstick { width: 100px; height: 8px; background: #5d2e0a; position: absolute; cursor: grab; border-radius: 4px; z-index: 100; box-shadow: 0 5px 10px rgba(0,0,0,0.5); }
+        #match-head { width: 18px; height: 14px; background: #4a0000; position: absolute; right: -5px; top: -3px; border-radius: 50%; }
+
+        /* OVERLAYS */
+        #word-flash { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'Great Vibes'; font-size: 8rem; color: var(--gold); pointer-events: none; z-index: 5000; opacity: 0; text-shadow: 0 0 30px var(--gold); }
+        
+        #ripple-overlay { position: fixed; top: 50%; left: 50%; width: 0; height: 0; background: var(--heart-red); border-radius: 50%; z-index: 4000; transform: translate(-50%, -50%); pointer-events: none; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop><source src="music.mp3" type="audio/mpeg"></audio>
+    <div id="star-container"></div>
+    <div id="word-flash"></div>
+    <div id="ripple-overlay"></div>
+
+    <div id="pass-screen" class="page active">
+        <h1 class="cursive" style="font-size: 3.5rem; margin-bottom: 10px;">For Chui Mui</h1>
+        <p style="letter-spacing: 5px; font-size: 0.7rem; color: #666;">IDENTITY VERIFICATION REQUIRED</p>
+        <input type="text" id="pass-input" placeholder="Birthday Date..." autocomplete="off">
+    </div>
+
+    <div id="intro-page" class="page">
+        <h2 id="intro-text" class="cursive" style="font-size: 3.5rem; width: 80%;"></h2>
+    </div>
+
+    <div id="page1" class="page">
+        <h1 class="cursive" style="font-size: 6rem; margin: 0;">For Ishita</h1>
+        <p class="cursive" style="font-size: 2.2rem; opacity: 0.8;">A magical journey for my Chui Mui... 🌸</p>
+        <button class="peak-btn" onclick="nextPage(2)">CLICK TO BEGIN ✨</button>
+    </div>
+
+    <div id="page2" class="page">
+        <div class="glass-card">
+            <h1 class="cursive" style="font-size: 3rem;">A Cutie was born...</h1>
+            <p style="line-height: 2; font-weight: 300;">Exactly <b style="color:var(--gold)">16 years ago</b>, the most cutest person was born for luckyyyyy my soft hearted sensitive bachi! This day is so special and enjoy this little efforts from your gadha!</p>
+            <button class="peak-btn" style="margin-top:20px;" onclick="nextPage(3)">Aage Dekho ❤️</button>
+        </div>
+    </div>
+
+    <div id="page3" class="page">
+        <h1 class="cursive" style="font-size: 3rem; margin-bottom: 50px;">Jalao and Wish Maango!</h1>
+        <div id="cake" style="font-size: 150px; filter: grayscale(1) blur(2px); transition: 1s;">🎂</div>
+        <div id="match-box" style="width:120px; height:70px; background:#222; border:2px dashed var(--gold); margin-top:40px; display:flex; justify-content:center; align-items:center; font-size:10px; letter-spacing:1px;">STRIKE HERE</div>
+        <div id="matchstick"><div id="match-head"></div></div>
+        
+        <div id="after-cake" style="display:none; margin-top:30px;">
+            <button class="peak-btn" onclick="blowCake()">Blow & Wish! 🎂</button>
+        </div>
+        <div id="hb-final" style="display:none; margin-top:20px;">
+            <h2 class="cursive" style="font-size: 3.5rem;">Happy Birthday my baby!</h2>
+            <button class="peak-btn" onclick="nextPage(4)">Next Surprise ✨</button>
+        </div>
+    </div>
+
+    <div id="page4" class="page">
+        <h2 class="cursive" style="font-size: 2.5rem; margin-bottom: 50px;">Our destiny is already connected...</h2>
+        <div id="laser-center" style="width:20px; height:20px; background:var(--gold); border-radius:50%; box-shadow: 0 0 30px var(--gold);"></div>
+        <button id="laser-start-btn" class="peak-btn" style="margin-top:100px;" onclick="triggerLasers()">Click to reveal the bond ✨</button>
+        <div id="laser-final" style="display:none; margin-top:50px;">
+            <h1 class="cursive" style="font-size: 4rem;">I LOVE YOU CHUI MUI</h1>
+            <button class="peak-btn" onclick="nextPage(5)">Read Your Letter... ❤️</button>
+        </div>
+    </div>
+
+    <div id="page5" class="page">
+        <div id="env-wrapper" style="cursor:pointer;" onclick="animateLetter()">
+            <div style="width:280px; height:180px; background:#fff; position:relative; border-radius:5px; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+                <div id="env-flap" style="position:absolute; top:0; width:0; height:0; border-left:140px solid transparent; border-right:140px solid transparent; border-top:100px solid #eee; transform-origin: top; transition: 1s; z-index:2;"></div>
+                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:60px; height:60px; background:var(--gold); border-radius:50%; z-index:3; display:flex; justify-content:center; align-items:center; font-family:'Great Vibes'; font-size:30px; color:#fff; box-shadow: 0 0 20px var(--gold);">I</div>
+            </div>
+        </div>
+        <div id="letter-content" class="glass-card" style="display:none; text-align:left;">
+            <h2 class="cursive" style="text-align:center; font-size: 2.5rem;">Meri Pyari Ishita ❤️</h2>
+            <div id="typewriter" style="font-size:0.95rem; line-height:1.8; max-height:350px; overflow-y:auto; padding-right:10px;"></div>
+            <button id="letter-next-btn" class="peak-btn" style="display:none; margin: 30px auto 0;" onclick="nextPage(6)">See Your Photos 📸</button>
+        </div>
+    </div>
+
+    <div id="page6" class="page">
+        <h1 class="cursive" style="font-size: 3rem; margin-bottom: 20px;">Memories Together</h1>
+        <div class="photo-container" id="main-photo-container">
+            <img id="main-img" src="photo1.jpg" alt="Memory">
+        </div>
+        <p id="p-count" style="margin-top:20px; font-weight:600; letter-spacing:2px;">PHOTO 1 OF 6</p>
+        <button id="gallery-btn" class="peak-btn" onclick="handleGallery()">Lucky</button>
+        <button id="final-nav-btn" class="peak-btn" style="display:none;" onclick="nextPage(7)">The End ❤️</button>
+    </div>
+
+    <div id="page7" class="page">
+        <div class="glass-card">
+            <h1 class="cursive" style="font-size: 5rem; margin:0;">The End ❤️</h1>
+            <p style="font-weight:300; margin-top:20px;">I tried my best aur isse pehle kisi ke liye aisa kabhi nahi kara 😭. I hope ye dekh kar tum smile kar rahi hogi. You deserve the whole world. Mwah! 💋</p>
+            <h2 class="cursive" style="font-size: 2.5rem; margin-top:30px;">I Love You Forever</h2>
+        </div>
+    </div>
+
+    <script>
+        gsap.registerPlugin(TextPlugin);
+
+        // 1. PEAK STARS
+        function createStars() {
+            const container = document.getElementById('star-container');
+            for(let i=0; i<200; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                let size = Math.random() * 2.5 + 'px';
+                star.style.width = size; star.style.height = size;
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh';
+                container.appendChild(star);
+                gsap.to(star, { opacity: 0.2, duration: Math.random()*2+1, repeat: -1, yoyo: true, ease: "sine.inOut" });
+            }
+        }
+        createStars();
+
+        // 2. PEAK PASSWORD & ENTRANCE
+        document.getElementById('pass-input').addEventListener('input', function(e) {
+            if(this.value.toLowerCase() === "16 april") {
+                document.getElementById('bgMusic').play().catch(() => {});
+                gsap.to("#pass-screen", { duration: 1.2, scale: 5, opacity: 0, filter: "blur(20px)", ease: "power4.in", onComplete: startIntro });
+            }
+        });
+
+        // 3. CINEMATIC INTRO
+        function startIntro() {
+            document.getElementById('pass-screen').style.display = 'none';
+            const introPage = document.getElementById('intro-page');
+            introPage.style.display = 'flex';
+            gsap.to(introPage, { opacity: 1, duration: 1 });
+
+            const tl = gsap.timeline();
+            tl.to("#intro-text", { duration: 2.5, text: "I searched the whole world...", ease: "none" })
+              .to("#intro-text", { duration: 1, opacity: 0, delay: 1.5 })
+              .set("#intro-text", { text: "But I found my universe in you." })
+              .to("#intro-text", { duration: 2.5, opacity: 1, ease: "none" })
+              .to(introPage, { duration: 2, opacity: 0, scale: 0.8, delay: 1.5, onComplete: cosmicHeartFormation });
+        }
+
+        // 4. COSMIC HEART FORMATION (PEAK)
+        function cosmicHeartFormation() {
+            document.getElementById('intro-page').style.display = 'none';
+            const stars = document.querySelectorAll('.star');
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            stars.forEach((star, i) => {
+                const t = i * 0.2;
+                const x = 160 * Math.pow(Math.sin(t), 3);
+                const y = -(130 * Math.cos(t) - 50 * Math.cos(2*t) - 20 * Math.cos(3*t) - 10 * Math.cos(4*t));
+                gsap.to(star, { x: centerX + x - parseFloat(star.style.left), y: centerY + y - parseFloat(star.style.top), duration: 2.5, ease: "expo.inOut" });
+            });
+
+            setTimeout(() => {
+                const p1 = document.getElementById('page1');
+                p1.style.display = 'flex';
+                gsap.to(p1, { opacity: 1, duration: 1 });
+                gsap.to(".star", { x: 0, y: 0, duration: 2, delay: 1, ease: "power2.out" });
+            }, 2600);
+        }
+
+        // 5. NAVIGATION WITH RIPPLE
+        function nextPage(num) {
+            const ripple = document.getElementById('ripple-overlay');
+            gsap.set(ripple, { width: 0, height: 0, opacity: 1 });
+            gsap.to(ripple, { width: "300vw", height: "300vw", duration: 1.2, ease: "power2.inOut", onComplete: () => {
+                document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+                const next = document.getElementById('page'+num);
+                next.style.display = 'flex';
+                next.classList.add('active');
+                gsap.to(next, { opacity: 1, duration: 0.8 });
+                gsap.to(ripple, { opacity: 0, duration: 0.8 });
+            }});
+        }
+
+        // 6. MATCHSTICK & CAKE
+        const stick = document.getElementById('matchstick');
+        let stickLit = false;
+        stick.onmousedown = (e) => {
+            document.onmousemove = (m) => {
+                gsap.set(stick, { left: m.pageX - 50, top: m.pageY - 4 });
+                const box = document.getElementById('match-box').getBoundingClientRect();
+                if(m.pageX > box.left && m.pageX < box.right && m.pageY > box.top && m.pageY < box.bottom && !stickLit) {
+                    stickLit = true;
+                    document.getElementById('match-head').style.background = "radial-gradient(circle, #fff, #ffae00, #ff4d00)";
+                    document.getElementById('match-head').style.boxShadow = "0 0 30px #ffae00";
+                    document.getElementById('cake').style.filter = "grayscale(0) blur(0px)";
+                    document.getElementById('cake').style.transform = "scale(1.1)";
+                    document.getElementById('after-cake').style.display = "block";
+                }
+            }
+            document.onmouseup = () => document.onmousemove = null;
+        };
+
+        function blowCake() {
+            confetti({ particleCount: 400, spread: 100, origin: { y: 0.7 } });
+            document.getElementById('after-cake').style.display = "none";
+            document.getElementById('hb-final').style.display = "block";
+        }
+
+        // 7. LASER CONNECTION
+        function triggerLasers() {
+            document.getElementById('laser-start-btn').style.display = 'none';
+            const center = document.getElementById('laser-center');
+            // Mock laser effect with ripples
+            for(let i=0; i<5; i++) {
+                const l = document.createElement('div');
+                l.style = `position:absolute; width:2px; height:0; background:var(--gold); top:50%; left:50%; transform-origin:top; transform: rotate(${i*72}deg); box-shadow: 0 0 15px var(--gold);`;
+                document.getElementById('page4').appendChild(l);
+                gsap.to(l, { height: "400px", duration: 1, ease: "expo.out" });
+            }
+            setTimeout(() => {
+                document.getElementById('laser-final').style.display = 'block';
+                gsap.from("#laser-final", { scale: 0, opacity: 0, duration: 1, ease: "elastic.out" });
+            }, 1200);
+        }
+
+        // 8. LETTER ANIMATION
+        function animateLetter() {
+            gsap.to("#env-flap", { rotationX: 180, duration: 1.2 });
+            gsap.to("#env-wrapper", { y: 200, opacity: 0, duration: 1, delay: 0.5, onComplete: () => {
+                document.getElementById('env-wrapper').style.display = 'none';
+                document.getElementById('letter-content').style.display = 'block';
+                const msg = `So meri pyari si jaanu chui mui, this was my little efforts ekdam thodese and bare minimum... I love youuuuu sooo much! You're my everything. This birthday is so so special for ussss.<br><br>This is your first birthday mere sath relationship me aane baad, i hope next 80 saal tak sare birthday sathme manaye ham. I can't live without you. I'll do everything for you meri bachi, literally best ho tum, my dream girl and my everything.<br><br>Even family maane ya na maane but mai hamesha tumhare sath rahunga forever. I can leave anyone for you. Pata h i was so shocked ki tumhe harsh aisa treat kra tha toh ha I'll do ya ek chij that you deserved and mai bare minimum bar bar isliye kehta rehta because you deserve the world meri jaan 🥰🥰`;
+                gsap.to("#typewriter", { duration: 25, text: { value: msg }, ease: "none", onComplete: () => {
+                    document.getElementById('letter-next-btn').style.display = "block";
+                }});
+            }});
+        }
+
+        // 9. GALLERY (ACCURATE CUSTOM FLOW)
+        let step = 1;
+        const btnSeq = ["Lucky", "Love", "Me", "More", "🥰😝"];
+        const flashSeq = ["I", "Love", "You", "So", "More"];
+
+        function handleGallery() {
+            if(step > 5) return;
+
+            const flash = document.getElementById('word-flash');
+            flash.innerText = flashSeq[step-1];
+            
+            // PEAK FLASH ANIMATION
+            const tl = gsap.timeline();
+            tl.to(flash, { opacity: 1, scale: 1.5, duration: 0.6, ease: "back.out" })
+              .to(flash, { opacity: 0, scale: 3, duration: 0.4, ease: "power2.in" });
+
+            // PHOTO CHANGE
+            gsap.to("#main-photo-container", { opacity: 0, rotation: 10, scale: 0.8, duration: 0.5, onComplete: () => {
+                step++;
+                document.getElementById('main-img').src = `photo${step}.jpg`;
+                document.getElementById('p-count').innerText = `PHOTO ${step} OF 6`;
+                gsap.to("#main-photo-container", { opacity: 1, rotation: -3, scale: 1, duration: 0.8, ease: "elastic.out(1, 0.5)" });
+                
+                if(step <= 5) {
+                    document.getElementById('gallery-btn').innerText = btnSeq[step-1];
+                } else {
+                    document.getElementById('gallery-btn').style.display = "none";
+                    document.getElementById('final-nav-btn').style.display = "block";
+                }
+            }});
+        }
+    </script>
+</body>
+          </html>
+  
