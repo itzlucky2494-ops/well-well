@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Chui Mui | Ishita</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --heart-red: #ff4d6d;
+            --soft-pink: #ffb7c5;
+            --gold: #D4AF37;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #000; /* Start deep black */
+            overflow: hidden; height: 100vh; color: #fff;
+        }
+
+        #star-container { position: fixed; width: 100%; height: 100%; z-index: 1; opacity: 0; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; }
+
+        /* GOATED BUTTONS */
+        button, .pulse-btn {
+            background: var(--glass);
+            color: white;
+            border: 1px solid var(--gold);
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+            z-index: 100;
+        }
+        button:hover { background: var(--heart-red); transform: scale(1.05); }
+
+        /* SCREENS */
+        .page { 
+            position: absolute; inset: 0; 
+            display: none; flex-direction: column; 
+            justify-content: center; align-items: center; 
+            z-index: 10; text-align: center; padding: 20px;
+        }
+        .active { display: flex; }
+
+        #pass-screen { z-index: 2000; background: #000; }
+        #pass-input { 
+            background: transparent; border: none; border-bottom: 2px solid var(--gold); 
+            color: var(--gold); font-size: 1.5rem; text-align: center; outline: none; width: 200px; 
+        }
+
+        .cursive { font-family: 'Great Vibes', cursive; color: var(--soft-pink); }
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); 
+            padding: 30px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.1);
+            max-width: 500px;
+        }
+
+        /* PHOTO FRAME */
+        .photo-frame {
+            width: 250px; height: 320px;
+            background: white; border: 10px solid white;
+            border-bottom: 50px solid white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative; overflow: hidden;
+        }
+        .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* MATCHSTICK */
+        #matchstick {
+            width: 80px; height: 10px; background: #8b4513;
+            position: absolute; cursor: grab; border-radius: 5px;
+        }
+        #match-head {
+            width: 15px; height: 12px; background: #5a0000;
+            position: absolute; right: -5px; top: -1px; border-radius: 50%;
+        }
+
+        /* OVERLAYS */
+        #word-overlay {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-family: 'Great Vibes'; font-size: 6rem; color: var(--gold);
+            pointer-events: none; z-index: 1000; opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop><source src="music.mp3" type="audio/mpeg"></audio>
+    <div id="star-container"></div>
+    <div id="word-overlay"></div>
+
+    <div id="pass-screen" class="page active">
+        <h2 class="cursive" style="font-size: 2.5rem;">Access Restricted</h2>
+        <p style="font-size: 0.8rem; letter-spacing: 2px; color: #888;">FOR CHUI MUI ONLY</p>
+        <input type="text" id="pass-input" placeholder="DD Month" autocomplete="off">
+    </div>
+
+    <div id="intro-sequence" class="page">
+        <div id="intro-text" class="cursive" style="font-size: 3rem;"></div>
+    </div>
+
+    <div id="page1" class="page">
+        <h1 class="cursive" style="font-size: 5rem; margin-bottom: 0;">For Ishita</h1>
+        <p class="cursive" style="font-size: 2rem;">A special journey for my Chui Mui... 🌸</p>
+        <button onclick="transitionTo(2)">Click to Begin ✨</button>
+    </div>
+
+    <div id="page2" class="page">
+        <div class="glass-card">
+            <h1 class="cursive">A Cutie was born...</h1>
+            <p style="line-height: 1.8;">Exactly <b>16 years ago</b>, the most cutest person was born for luckyyyyy my soft hearted sensitive bachi! This day is so special and enjoy this little efforts from your gadha!</p>
+            <button onclick="transitionTo(3)">Aage Dekho ❤️</button>
+        </div>
+    </div>
+
+    <div id="page3" class="page">
+        <h1 class="cursive" style="font-size: 3rem;">Jalao and Wish Maango!</h1>
+        <div id="cake-container" style="font-size: 100px; opacity: 0.5;">🎂</div>
+        <div id="match-box" style="width:100px; height:60px; background:#444; margin-top:20px; border:2px solid var(--gold); position:relative;">
+            <p style="font-size:10px; text-align:center;">STRIKE HERE</p>
+        </div>
+        <div id="matchstick"><div id="match-head"></div></div>
+        <button id="blow-btn" style="display:none; margin-top:30px;" onclick="blowCake()">Blow & Wish! 🎂</button>
+        <h2 id="hb-msg" class="cursive" style="display:none; font-size: 3rem; margin-top:20px;">Happy Birthday my baby!</h2>
+        <button id="cake-next" style="display:none; margin-top:20px;" onclick="transitionTo(4)">Next Surprise ✨</button>
+    </div>
+
+    <div id="page4" class="page">
+        <h2 class="cursive" style="font-size: 2.5rem;">Our destiny is already connected...</h2>
+        <canvas id="laserCanvas" style="position:absolute; inset:0; pointer-events:none;"></canvas>
+        <button id="laser-btn" onclick="startLasers()">Click to reveal the bond ✨</button>
+        <div id="laser-result" class="cursive" style="display:none; font-size: 4rem;">I LOVE YOU CHUI MUI</div>
+        <button id="laser-next" style="display:none; margin-top:20px;" onclick="transitionTo(5)">Read Your Letter... ❤️</button>
+    </div>
+
+    <div id="page5" class="page">
+        <div id="envelope" style="width:250px; height:150px; background:#fff; position:relative; cursor:pointer; border-radius:10px;" onclick="openLetter()">
+            <div id="seal" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:50px; height:50px; background:var(--gold); border-radius:50%; display:flex; justify-content:center; align-items:center; color:white; font-family:'Great Vibes'; font-size:24px; z-index:5;">I</div>
+            <div id="flap" style="position:absolute; top:0; width:0; height:0; border-left:125px solid transparent; border-right:125px solid transparent; border-top:80px solid #f0f0f0; transform-origin:top; z-index:4;"></div>
+        </div>
+        <div id="letter-card" class="glass-card" style="display:none; text-align:left;">
+            <h2 class="cursive" style="text-align:center;">Meri Pyari Ishita ❤️</h2>
+            <div id="typing-text" style="font-size:0.9rem; line-height:1.7; max-height:300px; overflow-y:auto;"></div>
+            <button id="letter-next" style="display:none; margin:20px auto;" onclick="transitionTo(6)">See Your Photos 📸</button>
+        </div>
+    </div>
+
+    <div id="page6" class="page">
+        <h1 class="cursive" style="font-size: 3rem;">Memories Together</h1>
+        <div class="photo-frame" id="photo-frame">
+            <img id="galleryImg" src="photo1.jpg">
+        </div>
+        <p id="photo-counter" style="margin-top:10px;">Photo 1 of 6</p>
+        <button id="gallery-btn" onclick="nextPhoto()">Lucky</button>
+        <button id="gallery-final-next" style="display:none; margin-top:20px;" onclick="transitionTo(7)">The End ❤️</button>
+    </div>
+
+    <div id="page7" class="page">
+        <div class="glass-card">
+            <h1 class="cursive" style="font-size: 4rem;">The End ❤️</h1>
+            <p style="font-size:0.9rem;">I tried my best aur isse pehle kisi ke liye aisa kabhi nahi kara 😭. I hope ye dekh kar tum smile kar rahi hogi. You deserve the whole world. Mwah! 💋</p>
+            <p class="cursive" style="font-size:2rem; margin-top:20px;">I Love You Forever</p>
+        </div>
+    </div>
+
+    <script>
+        // 1. STARS BACKGROUND
+        function initStars() {
+            const container = document.getElementById('star-container');
+            for(let i=0; i<150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                let size = Math.random() * 3 + 'px';
+                star.style.width = size; star.style.height = size;
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh';
+                container.appendChild(star);
+                gsap.to(star, { opacity: Math.random(), duration: Math.random()*2+1, repeat: -1, yoyo: true });
+            }
+        }
+        initStars();
+
+        // 2. PASSWORD SHATTER (Peak Animation)
+        const passInput = document.getElementById('pass-input');
+        passInput.addEventListener('input', function() {
+            if(this.value.toLowerCase() === "16 april") {
+                document.getElementById('bgMusic').play();
+                gsap.to("#pass-screen", { 
+                    duration: 1.5, scale: 2, filter: "blur(20px)", opacity: 0, 
+                    onComplete: () => {
+                        document.getElementById('pass-screen').style.display = 'none';
+                        startIntro();
+                    }
+                });
+            }
+        });
+
+        // 3. INTRO & COSMIC HEART (Peak)
+        function startIntro() {
+            const introDiv = document.getElementById('intro-sequence');
+            const introText = document.getElementById('intro-text');
+            introDiv.style.display = 'flex';
+            
+            const tl = gsap.timeline();
+            tl.to(introText, { duration: 2, text: "I searched the whole world...", opacity: 1 })
+              .to(introText, { duration: 1.5, opacity: 0, delay: 1 })
+              .to(introText, { duration: 2, text: "But I found my universe in you.", opacity: 1 })
+              .to(introDiv, { duration: 2, opacity: 0, delay: 1, onComplete: () => {
+                  introDiv.style.display = 'none';
+                  document.getElementById('star-container').style.opacity = 1;
+                  revealPage1();
+              }});
+        }
+
+        function revealPage1() {
+            // Stars forming heart animation (Concept via GSAP)
+            gsap.to(".star", { 
+                duration: 2, 
+                x: (i) => (window.innerWidth/2) + 160 * Math.pow(Math.sin(i), 3) - (window.innerWidth/2),
+                y: (i) => (window.innerHeight/2) - (130 * Math.cos(i) - 50 * Math.cos(2*i) - 20 * Math.cos(3*i) - 10 * Math.cos(4*i)) - (window.innerHeight/2),
+                ease: "power2.inOut"
+            });
+            setTimeout(() => {
+                document.getElementById('page1').classList.add('active');
+                gsap.to(".star", { duration: 2, x: 0, y: 0, delay: 2 }); // Back to normal
+            }, 1000);
+        }
+
+        // 4. NAVIGATION TRANSITIONS
+        function transitionTo(num) {
+            const current = document.querySelector('.page.active');
+            const next = document.getElementById('page' + num);
+            // HEART RIPPLE TRANSITION
+            const ripple = document.createElement('div');
+            ripple.style = "position:fixed; top:50%; left:50%; width:0; height:0; background:var(--heart-red); border-radius:50%; z-index:1000; transform:translate(-50%,-50%);";
+            document.body.appendChild(ripple);
+            
+            gsap.to(ripple, { width: "300vw", height: "300vw", duration: 1, onComplete: () => {
+                current.classList.remove('active');
+                next.classList.add('active');
+                gsap.to(ripple, { opacity: 0, duration: 0.5, onComplete: () => ripple.remove() });
+            }});
+        }
+
+        // 5. MATCHSTICK CAKE LOGIC
+        const stick = document.getElementById('matchstick');
+        let isLit = false;
+        // Simple drag logic
+        stick.onmousedown = (e) => {
+            document.onmousemove = (me) => {
+                stick.style.left = me.pageX + 'px';
+                stick.style.top = me.pageY + 'px';
+                if(me.pageX > window.innerWidth/2 - 50 && me.pageY > window.innerHeight/2 + 50) {
+                    if(!isLit) {
+                        isLit = true;
+                        document.getElementById('match-head').style.background = "orange";
+                        document.getElementById('match-head').style.boxShadow = "0 0 20px orange";
+                        document.getElementById('cake-container').style.opacity = 1;
+                        document.getElementById('blow-btn').style.display = 'block';
+                    }
+                }
+            }
+            document.onmouseup = () => document.onmousemove = null;
+        };
+
+        function blowCake() {
+            confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
+            document.getElementById('blow-btn').style.display = 'none';
+            document.getElementById('hb-msg').style.display = 'block';
+            document.getElementById('cake-next').style.display = 'block';
+        }
+
+        // 6. LASER CONNECTION (Option 3)
+        function startLasers() {
+            document.getElementById('laser-btn').style.display = 'none';
+            const canvas = document.getElementById('laserCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            // High Animation Laser Draw Logic...
+            gsap.to("#laser-result", { display: 'block', duration: 2, scale: 1.2, ease: "elastic" });
+            setTimeout(() => document.getElementById('laser-next').style.display = 'block', 3000);
+        }
+
+        // 7. LETTER (Word for Word)
+        function openLetter() {
+            gsap.to("#flap", { rotationX: 180, duration: 1 });
+            setTimeout(() => {
+                document.getElementById('envelope').style.display = 'none';
+                document.getElementById('letter-card').style.display = 'block';
+                typeLetter();
+            }, 1000);
+        }
+
+        function typeLetter() {
+            const msg = `So meri pyari si jaanu chui mui, this was my little efforts ekdam thodese and bare minimum... I love youuuuu sooo much! You're my everything. This birthday is so so special for ussss.<br><br>This is your first birthday mere sath relationship me aane baad, i hope next 80 saal tak sare birthday sathme manaye ham. I can't live without you. I'll do everything for you meri bachi, literally best ho tum, my dream girl and my everything.<br><br>Even family maane ya na maane but mai hamesha tumhare sath rahunga forever. I can leave anyone for you. Pata h i was so shocked ki tumhe harsh aisa treat kra tha toh ha I'll do ya ek chij that you deserved and mai bare minimum bar bar isliye kehta rehta because you deserve the world meri jaan 🥰🥰`;
+            let i = 0;
+            const target = document.getElementById('typing-text');
+            function type() {
+                if(i < msg.length) {
+                    if(msg.substr(i,4)==="<br>") { target.innerHTML += "<br>"; i+=4; }
+                    else { target.innerHTML += msg.charAt(i); i++; }
+                    target.scrollTop = target.scrollHeight;
+                    setTimeout(type, 50);
+                } else { document.getElementById('letter-next').style.display = 'block'; }
+            }
+            type();
+        }
+
+        // 8. CUSTOM GALLERY FLOW (The Final Request)
+        let currentPhoto = 1;
+        const btnTexts = ["Lucky", "Love", "Me", "More", "🥰😝"];
+        const overlayTexts = ["I", "Love", "You", "So", "More"];
+
+        function nextPhoto() {
+            if(currentPhoto >= 6) return;
+
+            const overlay = document.getElementById('word-overlay');
+            overlay.innerText = overlayTexts[currentPhoto-1];
+            
+            // Peak Transition Animation
+            gsap.to("#photo-frame", { opacity: 0, x: -100, duration: 0.5, onComplete: () => {
+                currentPhoto++;
+                document.getElementById('galleryImg').src = `photo${currentPhoto}.jpg`;
+                document.getElementById('photo-counter').innerText = `Photo ${currentPhoto} of 6`;
+                
+                // Show Overlay Word
+                gsap.fromTo(overlay, { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1.5, duration: 1, onComplete: () => {
+                    gsap.to(overlay, { opacity: 0, duration: 0.5 });
+                }});
+
+                gsap.to("#photo-frame", { opacity: 1, x: 0, duration: 0.5 });
+                
+                const btn = document.getElementById('gallery-btn');
+                if(currentPhoto < 6) {
+                    btn.innerText = btnTexts[currentPhoto-1];
+                } else {
+                    btn.style.display = 'none';
+                    document.getElementById('gallery-final-next').style.display = 'block';
+                }
+            }});
+        }
+    </script>
+</body>
+  </html>
+  
