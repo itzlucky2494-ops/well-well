@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Chui Mui | Ishita</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --heart-red: #ff4d6d;
+            --soft-pink: #ffb7c5;
+            --gold: #D4AF37;
+            --glass: rgba(255, 255, 255, 0.1);
+            --cake-pink: #ff85a1;
+            --cake-cream: #fff0f3;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #0a0a12;
+            overflow: hidden; height: 100vh; color: #fff;
+        }
+
+        #star-container { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle var(--t) infinite ease-in-out; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
+
+        button, .pulse-btn {
+            background: var(--glass); color: white; border: 1px solid rgba(212, 175, 55, 0.5);
+            padding: 15px 40px; border-radius: 50px; cursor: pointer; backdrop-filter: blur(10px);
+            font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 1rem;
+            transition: all 0.4s; margin: 25px 0; z-index: 1000;
+        }
+        button:hover { background: var(--heart-red); transform: scale(1.05); }
+
+        .page { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10; padding: 30px; text-align: center; }
+        .active { display: flex; }
+        .glass-card { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); padding: 40px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.2); max-width: 550px; width: 90%; }
+        h1, .cursive { font-family: 'Great Vibes', cursive; color: var(--soft-pink); text-shadow: 0 0 20px rgba(255,183,197,0.6); }
+
+        /* CAKE */
+        .cake-container { position: relative; width: 250px; height: 180px; margin: 40px auto; transform: scale(1.2); }
+        .cake-layer { position: absolute; left: 50%; transform: translateX(-50%); border-radius: 120px / 40px; }
+        .bottom-layer { bottom: 0; width: 220px; height: 90px; background: var(--cake-pink); border-bottom: 8px solid #e63946; }
+        .middle-layer { bottom: 35px; width: 170px; height: 75px; background: var(--cake-cream); border-bottom: 6px solid var(--soft-pink); }
+        .top-layer { bottom: 70px; width: 130px; height: 55px; background: var(--cake-pink); display: flex; justify-content: center; }
+        .photo-on-cake { width: 70px; height: 70px; border-radius: 50%; border: 3px solid white; object-fit: cover; position: absolute; top: -15px; z-index: 5; }
+        .candle { position: absolute; width: 10px; height: 35px; background: #ffd166; top: -40px; left: 50%; transform: translateX(-50%); border-radius: 4px; z-index: 10; }
+        .flame { position: absolute; width: 15px; height: 22px; background: #ff9f1c; border-radius: 50% 50% 20% 20%; top: -23px; left: -2px; box-shadow: 0 0 15px #ff9f1c; animation: flicker 0.1s infinite alternate; }
+        @keyframes flicker { 0% { transform: rotate(-3deg); } 100% { transform: rotate(3deg); } }
+        .flicker-hard { animation: flicker-hard-anim 0.2s infinite !important; }
+        @keyframes flicker-hard-anim { 0% { transform: rotate(-20deg); } 100% { transform: rotate(20deg); } }
+
+        .photo-frame { width: 240px; height: 310px; background: white; border: 8px solid white; border-bottom: 45px solid white; box-shadow: 0 15px 35px rgba(0,0,0,0.6); position: relative; }
+        #word-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0; font-family: 'Great Vibes'; font-size: 5.5rem; color: var(--gold); z-index: 100; text-shadow: 0 0 20px gold; pointer-events: none; }
+        #fw-canvas { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+        #final-text { font-family: 'Great Vibes'; font-size: 4rem; color: #fff; opacity: 0; z-index: 10; text-shadow: 0 0 30px var(--heart-red); filter: blur(10px); }
+        #bday-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 5000; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop><source src="music.mp3" type="audio/mpeg"></audio>
+    <div id="star-container"></div>
+
+    <div id="pass-screen" class="page active" style="background:#000; z-index:9999;">
+        <h2 class="cursive" style="font-size: 2.5rem; color: var(--gold);">Enter the Secret Key</h2>
+        <input type="text" id="pass-input" placeholder="Birth Date (e.g. 16 April)" autocomplete="off" style="background:transparent; border:none; border-bottom:2px solid var(--gold); color:var(--gold); text-align:center; font-size:1.5rem; outline:none; padding:10px; width:280px;">
+    </div>
+
+    <div id="intro-seq" class="page" style="background:#000; z-index:9000;">
+        <div id="t1" class="cursive" style="font-size:3rem; opacity:0;">I searched the whole world...</div>
+        <div id="t2" class="cursive" style="font-size:3rem; opacity:0;">But I found my universe in you.</div>
+    </div>
+
+    <div id="page1" class="page">
+        <h1 style="font-size: 4.5rem; margin: 0;">For Ishita</h1>
+        <p class="cursive" style="font-size: 2rem;">A special journey for my Chui Mui... 🌸</p>
+        <button class="pulse-btn" onclick="changePage(2)">Click to Begin ✨</button>
+    </div>
+
+    <div id="page2" class="page">
+        <div class="glass-card">
+            <h1>A Cutie was born...</h1>
+            <p style="line-height:1.6;">Exactly <b>16 years ago</b>, the most cutest person was born for luckyyyyy my soft hearted bachi! Enjoy this from your gadha! ❤️</p>
+            <button onclick="changePage(3)">Aage Dekho ❤️</button>
+        </div>
+    </div>
+
+    <div id="page3" class="page">
+        <h1 class="cursive" style="font-size: 3rem;">Make a Wish, Jaan!</h1>
+        <div class="cake-container">
+            <div class="cake-layer bottom-layer"></div>
+            <div class="cake-layer middle-layer"></div>
+            <div class="cake-layer top-layer"><img src="cake.jpg" class="photo-on-cake"><div class="candle"><div class="flame" id="main-flame"></div></div></div>
+        </div>
+        <button id="cake-btn" style="margin-top: 50px;" onclick="handleCakeTap()">Blow the Candle 💨</button>
+    </div>
+
+    <div id="page4" class="page">
+        <h1 class="cursive" style="font-size: 3.2rem;">Pop 5 Hearts!</h1>
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <div class="balloon" onclick="popH(this, 'I')" style="font-size:45px; cursor:pointer;">🎈</div>
+            <div class="balloon" onclick="popH(this, 'Love')" style="font-size:45px; cursor:pointer;">🎈</div>
+            <div class="balloon" onclick="popH(this, 'You')" style="font-size:45px; cursor:pointer;">🎈</div>
+            <div class="balloon" onclick="popH(this, 'Chui')" style="font-size:45px; cursor:pointer;">🎈</div>
+            <div class="balloon" onclick="popH(this, 'Mui')" style="font-size:45px; cursor:pointer;">🎈</div>
+        </div>
+        <button id="next4" style="visibility:hidden;" onclick="changePage(5)">Read Your Letter... ❤️</button>
+    </div>
+
+    <div id="page5" class="page">
+        <div class="glass-card">
+            <h2 class="cursive" style="font-size: 2.2rem;">Meri Pyari Ishita ❤️</h2>
+            <div id="type-box" style="line-height:1.7; font-size: 0.95rem; overflow-y:auto; max-height:280px; text-align: left;"></div>
+            <button id="next5" style="display:none; margin: 20px auto;" onclick="changePage(6)">See Your Photos 📸</button>
+        </div>
+    </div>
+
+    <div id="page6" class="page">
+        <div id="word-overlay"></div>
+        <div class="photo-frame" id="frame"><img id="gImg" src="photo1.jpg" style="width:100%; height:100%; object-fit:cover;"></div>
+        <p id="pCount" style="margin-top:15px; opacity:0.8;">Memory 1 of 6</p>
+        <button id="showBtn" onclick="revealWord()">Show ✨</button>
+        <button id="nextPhotoBtn" style="display:none;" onclick="nextPhotoLogic()">Next Memory ❤️</button>
+        <button id="next6" style="display:none;" onclick="changePage(7)">Final Message ❤️</button>
+    </div>
+
+    <div id="page7" class="page"><div class="glass-card"><h1 class="cursive" style="font-size: 3.5rem;">The End ❤️</h1><button class="pulse-btn" onclick="startFireworks()">One Last Surprise 🎆</button></div></div>
+
+    <div id="page8" class="page"><canvas id="fw-canvas"></canvas><div id="final-text">The End Baby</div></div>
+
+    <div id="bday-overlay"><h1 class="cursive" style="font-size: 4.5rem; color: var(--heart-red); margin:0;">Happy Birthday</h1><h1 class="cursive" style="font-size: 3.5rem; color: #fff; margin:0;">My Babyyyyy! 🎂</h1></div>
+
+    <script>
+        const music = document.getElementById('bgMusic');
+        let cakeTaps = 0;
+
+        function initStars() {
+            const container = document.getElementById('star-container');
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = star.style.height = (Math.random()*2+1)+'px';
+                star.style.left = Math.random()*100+'vw'; star.style.top = Math.random()*100+'vh';
+                star.style.setProperty('--t', (Math.random()*3+2)+'s');
+                container.appendChild(star);
+            }
+        }
+        window.onload = initStars;
+
+        // FIXED PASSWORD LOGIC
+        document.getElementById('pass-input').addEventListener('input', function() {
+            if(this.value.toLowerCase() === "16 april") {
+                music.play().catch(e => {});
+                gsap.to("#pass-screen", { opacity:0, duration: 0.5, onComplete: () => {
+                    document.getElementById('pass-screen').classList.remove('active');
+                    runIntro();
+                }});
+            }
+        });
+
+        function runIntro() {
+            const intro = document.getElementById('intro-seq'); 
+            intro.classList.add('active');
+            const tl = gsap.timeline();
+            tl.to("#t1", { opacity:1, duration:1.5 })
+              .to("#t1", { opacity:0, duration:1, delay:1 })
+              .to("#t2", { opacity:1, duration:1.5 })
+              .to("#t2", { opacity:0, duration:1, delay:1 })
+              .to(intro, { opacity:0, duration:0.5, onComplete: () => { 
+                  intro.classList.remove('active'); 
+                  document.getElementById('page1').classList.add('active'); 
+                  gsap.from("#page1", { opacity:0, scale:1.1, duration:0.8 });
+              }});
+        }
+
+        function changePage(n) {
+            const curr = document.querySelector('.page.active'), next = document.getElementById('page'+n);
+            gsap.to(curr, { opacity:0, scale:0.9, duration:0.4, onComplete: () => {
+                curr.classList.remove('active'); next.classList.add('active');
+                gsap.fromTo(next, { opacity:0, scale:1.1 }, { opacity:1, scale:1, duration:0.5 });
+                if(n===5) startTyping();
+            }});
+        }
+
+        function handleCakeTap() {
+            cakeTaps++; const flame = document.getElementById('main-flame'), btn = document.getElementById('cake-btn');
+            if(cakeTaps === 1) { flame.classList.add('flicker-hard'); btn.innerText = "Awlle awlle, try again baby! 😚"; setTimeout(() => flame.classList.remove('flicker-hard'), 1500); }
+            else if(cakeTaps === 2) { flame.classList.add('flicker-hard'); btn.innerText = "Ek aur baar jorse! 💨"; gsap.to(flame, { scale: 1.8, duration: 0.5 }); setTimeout(() => { flame.classList.remove('flicker-hard'); gsap.to(flame, { scale: 1, duration: 0.5 }); }, 1500); }
+            else { flame.style.display = 'none'; btn.style.display = 'none'; document.getElementById('bday-overlay').style.display = 'flex'; confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } }); setTimeout(() => { document.getElementById('bday-overlay').style.display = 'none'; changePage(4); }, 4000); }
+        }
+
+        let popped = 0;
+        function popH(el, txt) { 
+            confetti({ particleCount: 30, origin: { x: el.getBoundingClientRect().left/window.innerWidth, y: 0.7 } }); 
+            el.innerHTML = `<span class="cursive" style="font-size:1.5rem; color:var(--gold);">${txt}</span>`; 
+            if(++popped >= 5) document.getElementById('next4').style.visibility = 'visible'; 
+        }
+
+        function startTyping() {
+            const msg = `So meri pyari si jaanu chui mui, this was my little efforts ekdam thodese and bare minimum... I love youuuuu sooo much! You're my everything. This birthday is so so special for ussss.<br><br>This is your first birthday mere sath relationship me aane baad, i hope next 80 saal tak sare birthday sathme manaye ham. I can't live without you. I'll do everything for you meri bachi, literally best ho tum, my dream girl and my everything.`;
+            let i = 0; const box = document.getElementById("type-box"); if(box.innerHTML !== "") return;
+            function type() { if (i < msg.length) { if (msg.substr(i, 4) === "<br>") { box.innerHTML += "<br>"; i += 4; } else { box.innerHTML += msg.charAt(i); i++; } box.scrollTop = box.scrollHeight; setTimeout(type, 40); } else { document.getElementById("next5").style.display = "block"; } }
+            type();
+        }
+
+        let pIdx = 0; const words = ["I", "Love", "You", "So", "Much", "Jaanu"];
+        function revealWord() {
+            const overlay = document.getElementById('word-overlay'), showBtn = document.getElementById('showBtn'), nextBtn = document.getElementById('nextPhotoBtn'), finalBtn = document.getElementById('next6');
+            showBtn.style.display = 'none'; overlay.innerText = words[pIdx];
+            gsap.fromTo(overlay, { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1.3, duration: 0.8, onComplete: () => { setTimeout(() => { gsap.to(overlay, { opacity: 0, scale: 2.5, duration: 0.5, onComplete: () => { if(pIdx < 5) nextBtn.style.display = 'block'; else finalBtn.style.display = 'block'; }}); }, 1200); }});
+        }
+
+        function nextPhotoLogic() {
+            pIdx++; const nextBtn = document.getElementById('nextPhotoBtn'), showBtn = document.getElementById('showBtn'), frame = document.getElementById('frame');
+            nextBtn.style.display = 'none'; gsap.to(frame, { opacity: 0, x: -100, duration: 0.5, onComplete: () => { document.getElementById('gImg').src = `photo${pIdx + 1}.jpg`; document.getElementById('pCount').innerText = `Memory ${pIdx + 1} of 6`; gsap.fromTo(frame, { opacity: 0, x: 100 }, { opacity: 1, x: 0, duration: 0.5 }); showBtn.style.display = 'block'; }});
+        }
+
+        const canvas = document.getElementById('fw-canvas'), ctx = canvas.getContext('2d');
+        let particles = [], rockets = [];
+        class Rocket {
+            constructor() { this.x = Math.random()*canvas.width; this.y = canvas.height; this.ty = Math.random()*canvas.height*0.4; this.s = 8; }
+            update() { this.y -= this.s; if(this.y<=this.ty) { explode(this.x, this.y); return false; } return true; }
+            draw() { ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(this.x, this.y, 2, 0, Math.PI*2); ctx.fill(); }
+        }
+        class Particle {
+            constructor(x, y, h) { this.x=x; this.y=y; this.h=h; this.a=Math.random()*Math.PI*2; this.v=Math.random()*(h?3:6)+2; this.al=1; this.d=Math.random()*0.01+0.01; }
+            update() { this.x+=Math.cos(this.a)*this.v; this.y+=Math.sin(this.a)*this.v+0.15; this.al-=this.d; return this.al>0; }
+            draw() { ctx.save(); ctx.globalAlpha=this.al; ctx.translate(this.x, this.y); ctx.fillStyle=this.h?"#ff4d6d":`hsl(${Math.random()*360},100%,70%)`;
+                if(this.h) { ctx.beginPath(); ctx.moveTo(0,0); ctx.bezierCurveTo(-5,-5,-10,5,0,10); ctx.bezierCurveTo(10,5,5,-5,0,0); ctx.fill(); }
+                else { ctx.beginPath(); ctx.arc(0,0,2,0,Math.PI*2); ctx.fill(); } ctx.restore(); }
+        }
+        function explode(x,y) { for(let i=0;i<50;i++) particles.push(new Particle(x,y,false)); for(let i=0;i<15;i++) particles.push(new Particle(x,y,true)); }
+        function updateFW() {
+            ctx.fillStyle='rgba(0,0,0,0.2)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+            rockets=rockets.filter(r=>{ r.draw(); return r.update(); }); particles=particles.filter(p=>{ p.draw(); return p.update(); });
+            requestAnimationFrame(updateFW);
+        }
+        function startFireworks() {
+            changePage(8); canvas.width=window.innerWidth; canvas.height=window.innerHeight; requestAnimationFrame(updateFW);
+            setInterval(()=>rockets.push(new Rocket()), 700);
+            setTimeout(()=>{ gsap.to("#final-text", { opacity:1, filter:"blur(0px)", scale:1, duration:3 }); }, 4000);
+        }
+    </script>
+</body>
+      </html>
+        
