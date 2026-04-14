@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For My Chui Mui | Ishita</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        :root { --heart-red: #ff4d6d; --soft-pink: #ffb7c5; --gold: #D4AF37; }
+        body, html { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: #0a0a12; overflow: hidden; height: 100vh; color: #fff; }
+        #star-container { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle var(--t) infinite ease-in-out; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
+        
+        /* Pages - Added pointer-events to ensure buttons are clickable */
+        .page { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10; padding: 20px; text-align: center; box-sizing: border-box; pointer-events: auto; }
+        .active { display: flex; }
+        
+        /* Passcode Styles */
+        #pass-screen { background: #e65c34; flex-direction: row; gap: 40px; z-index: 5000; }
+        .dots-container { display: flex; gap: 12px; justify-content: center; margin-bottom: 25px; }
+        .dot { width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; transition: 0.3s; }
+        .dot.filled { background: white; box-shadow: 0 0 10px white; }
+        .keypad { display: grid; grid-template-columns: repeat(3, 65px); gap: 12px; }
+        .key { width: 65px; height: 65px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); display: flex; justify-content: center; align-items: center; font-size: 1.4rem; cursor: pointer; background: rgba(255,255,255,0.1); }
+        
+        .polaroid { background: white; padding: 10px 10px 35px 10px; width: 200px; box-shadow: 15px 15px 35px rgba(0,0,0,0.3); transform: rotate(-3deg); position: relative; }
+        .polaroid img { width: 100%; display: block; }
+        .blue-ribbon { position: absolute; top: -15px; right: -15px; width: 60px; z-index: 3; }
+        .teddy-bear { position: absolute; bottom: -40px; left: -40px; width: 90px; z-index: 3; }
+
+        .glass-card { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(15px); padding: 25px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.15); max-width: 450px; width: 90%; }
+        h1, .cursive { font-family: 'Great Vibes', cursive; color: var(--soft-pink); }
+        button { background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--gold); padding: 12px 28px; border-radius: 50px; cursor: pointer; font-weight: 600; margin-top: 15px; z-index: 100; position: relative; }
+        
+        .photo-frame { width: 220px; height: 280px; background: white; border: 8px solid white; border-bottom: 35px solid white; box-shadow: 0 15px 30px rgba(0,0,0,0.5); opacity: 0; }
+        #word-overlay { position: absolute; font-family: 'Great Vibes'; font-size: 4.5rem; color: var(--gold); z-index: 100; opacity: 0; pointer-events: none; }
+        
+        @media (max-width: 650px) { #pass-screen { flex-direction: column; gap: 30px; } .polaroid { width: 160px; } }
+    </style>
+</head>
+<body>
+    <audio id="bgMusic" loop><source src="music.mp3" type="audio/mpeg"></audio>
+    <div id="star-container"></div>
+
+    <div id="pass-screen" class="page active">
+        <div class="polaroid-side">
+            <img src="https://i.ibb.co/99YfDqX/ribbon.png" class="blue-ribbon">
+            <div class="polaroid"><img src="photo1.jpg"></div>
+            <img src="https://i.ibb.co/L6M0m7n/teddy.png" class="teddy-bear">
+        </div>
+        <div class="passcode-container">
+            <p>Entre a passcode</p>
+            <div class="dots-container"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <div class="keypad">
+                <div class="key" onclick="pressKey('1')">1</div><div class="key" onclick="pressKey('2')">2</div><div class="key" onclick="pressKey('3')">3</div>
+                <div class="key" onclick="pressKey('4')">4</div><div class="key" onclick="pressKey('5')">5</div><div class="key" onclick="pressKey('6')">6</div>
+                <div class="key" onclick="pressKey('7')">7</div><div class="key" onclick="pressKey('8')">8</div><div class="key" onclick="pressKey('9')">9</div>
+                <div class="key" onclick="pressKey('*')">*</div><div class="key" onclick="pressKey('0')">0</div><div class="key" onclick="pressKey('#')">#</div>
+            </div>
+            <p style="font-size:0.8rem; opacity:0.7; margin-top:20px;">hint- its are fav code</p>
+        </div>
+    </div>
+
+    <div id="intro-seq" class="page" style="background:#000; z-index:1500;">
+        <div id="t1" class="cursive" style="font-size:2.5rem; opacity:0; position:absolute;">I searched the whole world...</div>
+        <div id="t2" class="cursive" style="font-size:2.5rem; opacity:0; position:absolute;">But I found my universe in you.</div>
+    </div>
+
+    <div id="page1" class="page"><h1 id="mt" style="font-size:4rem; filter:blur(15px); opacity:0;">For Ishita</h1><p class="cursive" style="font-size:1.8rem;">A special journey for my Chui Mui... 🌸</p><button onclick="changePage(2)">Click to Begin ✨</button></div>
+    
+    <div id="page2" class="page"><div class="glass-card"><h1>A Cutie was born...</h1><p>Exactly <b>16 years ago</b>, the most cutest person was born for luckyyyyy my soft hearted sensitive bachi!</p><button onclick="changePage(3)">Aage Dekho ❤️</button></div></div>
+    
+    <div id="page3" class="page"><h1 class="cursive" style="font-size:3rem;">Make a Wish, Jaan!</h1><div id="cake" style="font-size:80px; cursor:pointer;" onclick="blowCake()">🎂</div></div>
+    
+    <div id="page4" class="page">
+        <h1 class="cursive" style="font-size:3rem;">Pop 5 Hearts!</h1>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+            <div onclick="popHeart(this,'I')" style="font-size:40px; cursor:pointer;">🎈</div><div onclick="popHeart(this,'Love')" style="font-size:40px; cursor:pointer;">🎈</div><div onclick="popHeart(this,'You')" style="font-size:40px; cursor:pointer;">🎈</div><div onclick="popHeart(this,'Chui')" style="font-size:40px; cursor:pointer;">🎈</div><div onclick="popHeart(this,'Mui')" style="font-size:40px; cursor:pointer;">🎈</div>
+        </div>
+        <button id="next4" style="visibility:hidden;" onclick="changePage(5)">Read Your Letter... ❤️</button>
+    </div>
+
+    <div id="page5" class="page"><div id="lc" class="glass-card"><h2 class="cursive">Meri Pyari Ishita ❤️</h2><div id="tb" style="line-height:1.6; font-size:0.9rem; max-height:250px; overflow-y:auto;"></div><button id="next5" style="display:none; margin:15px auto;" onclick="changePage(6)">See Our Memories 📸</button></div></div>
+
+    <div id="page6" class="page">
+        <h1 class="cursive" style="font-size:2.8rem;">Our Memories</h1><div id="wo"></div>
+        <div class="photo-frame" id="frm"><img id="gi" src="photo1.jpg" style="width:100%; height:100%; object-fit:cover;"></div>
+        <p id="pc" style="font-size:0.8rem; margin-top:10px;">Memory 1 of 4</p>
+        <button id="sb" onclick="revealWord()">Show ✨</button>
+        <button id="np" style="display:none;" onclick="nextPhoto()">Next Memory ❤️</button>
+        <button id="n6" style="display:none;" onclick="changePage(7)">Final Message ❤️</button>
+    </div>
+
+    <div id="page7" class="page"><div class="glass-card"><h1 class="cursive">The End ❤️</h1><p>I hope ye dekh kar tum smile kar rahi hogi. Mwah! 💋</p><button onclick="finalFireworks()">One Last Surprise 🎆</button></div></div>
+    
+    <div id="page8" class="page"><canvas id="fw-canvas" style="position:absolute; inset:0;"></canvas><div id="ft" style="font-family:'Great Vibes'; font-size:3.5rem; opacity:0; z-index:10;">The End Baby</div></div>
+
+    <script>
+        const music = document.getElementById('bgMusic'); 
+        let currentPass = "", popped = 0, photoIdx = 0; 
+        const correctCode = "1604", memoryWords = ["I", "Love", "You", "Meri Jaanu"];
+
+        function pressKey(num) {
+            if(currentPass.length < 4) {
+                currentPass += num;
+                updateDots();
+                if(currentPass.length === 4) {
+                    if(currentPass === correctCode) unlock();
+                    else { gsap.to(".dots-container", { x:10, repeat:5, yoyo:true, duration:0.05, onComplete:()=>{ currentPass=""; updateDots(); }}); }
+                }
+            }
+        }
+
+        function updateDots() {
+            const d = document.querySelectorAll('.dot');
+            d.forEach((x, i) => i < currentPass.length ? x.classList.add('filled') : x.classList.remove('filled'));
+        }
+
+        function unlock() {
+            music.play().catch(e=>{});
+            gsap.to("#pass-screen", { opacity:0, duration:1, onComplete:()=>{ document.getElementById('pass-screen').classList.remove('active'); startIntro(); }});
+        }
+
+        function startIntro() {
+            const i = document.getElementById('intro-seq'); i.classList.add('active');
+            gsap.timeline().to("#t1",{opacity:1,duration:1.5}).to("#t1",{opacity:0,duration:0.8,delay:1}).to("#t2",{opacity:1,duration:1.5}).to("#t2",{opacity:0,duration:0.8,delay:1}).to(i,{opacity:0,onComplete:()=>{ i.classList.remove('active'); document.getElementById('page1').classList.add('active'); gsap.to("#mt",{opacity:1,filter:"blur(0px)",duration:2}); }});
+        }
+
+        function changePage(n) {
+            const curr = document.querySelector('.page.active');
+            const next = document.getElementById('page'+n);
+            gsap.to(curr, {opacity:0, scale:0.9, duration:0.6, onComplete:()=>{ 
+                curr.classList.remove('active'); next.classList.add('active');
+                gsap.fromTo(next, {opacity:0, scale:1.1}, {opacity:1, scale:1, duration:0.8});
+                if(n === 5) startTyping();
+            }});
+        }
+
+        function blowCake() { confetti({particleCount:150, spread:60}); setTimeout(()=>changePage(4), 2000); }
+        function popHeart(el,t) { confetti({particleCount:20}); el.innerHTML=`<span class="cursive" style="color:var(--gold); font-size:1.2rem">${t}</span>`; if(++popped>=5) document.getElementById('next4').style.visibility='visible'; }
+        
+        function startTyping() {
+            const m=`Relationship me aane baad ye tumhara first birthday hai. I love you so much and you deserve the world meri Chui Mui! 🥰`;
+            let i=0; function t(){ if(i<m.length){ document.getElementById("tb").innerHTML+=m.charAt(i++); setTimeout(t,40); } else document.getElementById("next5").style.display="block"; } t();
+        }
+
+        function revealWord() {
+            const o=document.getElementById('wo'), f=document.getElementById('frm');
+            document.getElementById('sb').style.display='none'; o.innerText=memoryWords[photoIdx];
+            gsap.fromTo(o, {opacity:0, filter:"blur(15px)"}, {opacity:1, filter:"blur(0px)", duration:1});
+            setTimeout(()=>{ gsap.to(o, {opacity:0, duration:0.5}); gsap.to(f, {opacity:1, duration:1, onComplete:()=>{ photoIdx<3 ? document.getElementById('np').style.display='block' : document.getElementById('n6').style.display='block'; }}); }, 2000);
+        }
+
+        function nextPhoto() {
+            photoIdx++; document.getElementById('np').style.display='none';
+            gsap.to("#frm", {opacity:0, duration:0.5, onComplete:()=>{ 
+                document.getElementById('gi').src=`photo${photoIdx+1}.jpg`; 
+                document.getElementById('pc').innerText=`Memory ${photoIdx+1} of 4`;
+                document.getElementById('sb').style.display='block'; 
+            }});
+        }
+
+        function finalFireworks() { changePage(8); setTimeout(()=>gsap.to("#ft",{opacity:1, duration:3}), 2000); /* Fireworks code integrated simply */ }
+
+        window.onload = () => {
+            const c = document.getElementById('star-container');
+            for(let i=0; i<80; i++) {
+                const s = document.createElement('div'); s.className='star'; s.style.width='2px'; s.style.height='2px';
+                s.style.left=Math.random()*100+'vw'; s.style.top=Math.random()*100+'vh'; s.style.setProperty('--t',(Math.random()*3+2)+'s');
+                c.appendChild(s);
+            }
+        };
+    </script>
+</body>
+                               </html>
+  
