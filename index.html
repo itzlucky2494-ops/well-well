@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Charu Sharma</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        :root { --heart-red: #ff4d6d; --soft-pink: #ffb7c5; --gold: #D4AF37; --glass: rgba(255, 255, 255, 0.08); }
+        body, html { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: #0a0a12; overflow: hidden; height: 100vh; color: #fff; }
+        #star-container { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle var(--t) infinite ease-in-out; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
+        button, .pulse-btn { background: var(--glass); color: white; border: 1px solid rgba(212, 175, 55, 0.5); padding: 12px 30px; border-radius: 50px; cursor: pointer; backdrop-filter: blur(10px); font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 0.9rem; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin: 20px 0; z-index: 1000; outline: none; }
+        button:hover, .pulse-btn:hover { transform: scale(1.1) translateY(-3px); background: var(--heart-red); box-shadow: 0 10px 25px rgba(255, 77, 109, 0.5); }
+        .page { position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 10; padding: 20px; text-align: center; box-sizing: border-box; }
+        .active { display: flex; }
+        .glass-card { background: rgba(255, 255, 255, 0.06); backdrop-filter: blur(15px); padding: 25px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.12); max-width: 500px; width: 95%; box-sizing: border-box; }
+        h1, .pink-font { font-family: 'Great Vibes', cursive; color: var(--soft-pink); text-shadow: 0 0 15px rgba(255,183,197,0.5); font-weight: normal; }
+        .balloon-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 30px 0; min-height: 120px; }
+        .balloon { font-size: 55px; cursor: pointer; display: inline-block; animation: float var(--ft) infinite ease-in-out; transition: transform 0.3s; }
+        @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-15px) rotate(3deg); } }
+        .revealed-text { font-family: 'Great Vibes', cursive; font-size: 2.2rem; color: var(--gold); display: block; text-shadow: 0 0 10px gold; animation: popIn 0.5s ease-out forwards; }
+        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .fp-container { width: 80px; height: 80px; border: 2px dashed var(--gold); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 40px; background: rgba(255,255,255,0.05); margin: 20px 0; position: relative; }
+        .fp-container::after { content: ''; position: absolute; width: 100%; height: 2px; background: #00ffcc; top: 0; animation: scan 2s linear infinite; box-shadow: 0 0 10px #00ffcc; }
+        @keyframes scan { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
+        .drawing-frame { width: 280px; height: 280px; background: rgba(255,255,255,0.05); border: 4px solid white; box-shadow: 0 15px 35px rgba(0,0,0,0.6); margin-top: 15px; display: none; opacity: 0; }
+        .envelope-wrapper { position: relative; width: 250px; height: 160px; background: #fff5f7; border-radius: 5px; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin: 20px 0; }
+        .envelope-wrapper:before { content: ''; position: absolute; top: 0; width: 0; height: 0; border-top: 90px solid #ffccd5; border-left: 125px solid transparent; border-right: 125px solid transparent; z-index: 2; transition: 0.6s; transform-origin: top; }
+        .open-envelope:before { transform: rotateX(180deg); z-index: 0; }
+        .seal { position: absolute; width: 50px; height: 50px; background: #880e4f; border-radius: 50%; z-index: 3; display: flex; justify-content: center; align-items: center; color: gold; font-family: 'Great Vibes'; font-size: 24px; box-shadow: 0 0 10px gold; }
+        #fw-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
+        #final-text { font-family: 'Great Vibes'; font-size: 4rem; color: #fff; opacity: 0; z-index: 10; text-shadow: 0 0 20px var(--heart-red), 0 0 40px #ff0000; pointer-events: none; }
+        .music-toggle { position: fixed; top: 15px; right: 15px; z-index: 9999; background: var(--glass); border: 1px solid white; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop><source src="music.mp3" type="audio/mpeg"></audio>
+    <button class="music-toggle" onclick="toggleMusic()">🎵</button>
+    <div id="star-container"></div>
+
+    <!-- Page 1: Welcome -->
+    <div id="page1" class="page active">
+        <h1 style="font-size: 3.8rem; margin: 0; opacity:0; id='title1'" id="welcome-title">WELCOME CHARU SHARMAAAA</h1>
+        <p style="font-size: 0.95rem; max-width: 450px; line-height: 1.6; color: #ccc; margin-top: 20px;">
+            paragraphs na likhne the I just wanted to make u feel special nd ye bekar si website me bhut time lag gya because kabhi kisi ke liye na kra ik cringe h but okay ISSOKE
+        </p>
+        <button class="pulse-btn" onclick="startExperience()">Enter ✨</button>
+    </div>
+
+    <!-- Page 2: Balloons Pop -->
+    <div id="page2" class="page">
+        <h1 class="pink-font" style="font-size: 3rem; margin: 0;">Pop the Hearts</h1>
+        <div class="balloon-container" id="b-container"></div>
+        <button id="next2" style="display:none;" onclick="triggerDecline(1)">Enter ❤️</button>
+    </div>
+
+    <!-- Page 3: Showoff Screen (Access Blocked / Fingerprint) -->
+    <div id="page3" class="page">
+        <div class="glass-card" id="showoff-card">
+            <h2 id="status-title" style="color: var(--heart-red); font-size: 1.8rem;">Access Declined</h2>
+            <p id="status-desc" style="font-size: 0.95rem;">Authentication failed. Identity verification required.</p>
+            <div id="action-area">
+                <button onclick="triggerDecline(2)">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 4: My Little Effort (Drawing Screen) -->
+    <div id="page4" class="page">
+        <h1 id="effort-title" style="font-size: 3.2rem; margin: 0; opacity: 0; filter: blur(10px);">MY LITTLE EFFORT</h1>
+        <div class="drawing-frame" id="dFrame">
+            <img src="drawing.jpg" alt="Drawing" style="width:100%; height:100%; object-fit:cover;">
+        </div>
+        <div id="drawing-actions" style="margin-top: 20px;">
+            <button id="drawShowBtn" onclick="handleDrawingClick()">Show ✨</button>
+            <div id="please-input-area" style="display:none;">
+                <p style="color:#ff4d6d; font-family:'Poppins'; font-weight:600; font-size:1.1rem; margin:10px 0;" id="hint-msg">chal please bol😈</p>
+                <input type="text" id="please-text" placeholder="Type here..." autocomplete="off" style="background:transparent; border:none; border-bottom:2px solid white; color:white; text-align:center; font-size:1.2rem; outline:none; padding:8px; width:200px;">
+                <br><button onclick="checkPleaseToken()" style="padding:8px 20px; font-size:0.85rem; margin-top:10px;">Submit</button>
+            </div>
+        </div>
+        <button id="next4" style="display:none; margin-top:20px;" onclick="changePage(5)">Aage Chalo ❤️</button>
+    </div>
+
+    <!-- Page 5: Letter -->
+    <div id="page5" class="page">
+        <div id="envelope-scene">
+            <h2 class="pink-font" style="font-size: 2.5rem;">One Last Letter...</h2>
+            <div class="envelope-wrapper" id="env" onclick="openLetter()"><div class="seal">C</div></div>
+        </div>
+        <div class="glass-card" id="letter-card" style="display:none; text-align: left;">
+            <h2 class="pink-font" style="text-align: center; font-size: 2rem; margin-top: 0;">Charu ❤️</h2>
+            <div id="type-box" style="line-height:1.6; font-size: 0.88rem; overflow-y:auto; max-height:290px; padding-right:5px; white-space: pre-line;"></div>
+            <button id="next5" style="display:none; margin: 20px auto 0 auto;" onclick="changePage(6)">Goodbye ❤️</button>
+        </div>
+    </div>
+
+    <!-- Page 6: Fireworks End Canvas -->
+    <div id="page6" class="page">
+        <canvas id="fw-canvas"></canvas>
+        <div id="final-text">The End Baby</div>
+    </div>
+
+    <script>
+        const music = document.getElementById('bgMusic');
+        let musicPlaying = false;
+        function toggleMusic() { if(musicPlaying) { music.pause(); } else { music.play().catch(()=>{}); } musicPlaying = !musicPlaying; }
+
+        function initStars() {
+            const container = document.getElementById('star-container');
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div'); star.className = 'star';
+                const s = (Math.random() * 2 + 1) + 'px';
+                star.style.width = s; star.style.height = s;
+                star.style.left = Math.random() * 100 + 'vw'; star.style.top = Math.random() * 100 + 'vh';
+                star.style.setProperty('--t', (Math.random() * 3 + 2) + 's');
+                container.appendChild(star);
+            }
+        }
+        window.onload = () => { initStars(); gsap.to("#welcome-title", { opacity:1, duration:1.5, ease:"power2.out" }); };
+
+        function startExperience() { music.play().catch(()=>{}); musicPlaying = true; changePage(2); buildBalloons(); }
+
+        function changePage(n) {
+            const curr = document.querySelector('.page.active'); const next = document.getElementById('page'+n);
+            gsap.to(curr, { opacity:0, scale:0.95, duration:0.5, onComplete: () => {
+                curr.classList.remove('active'); next.classList.add('active');
+                gsap.fromTo(next, { opacity:0, scale:1.05 }, { opacity:1, scale:1, duration:0.5 });
+                if(n === 4) { gsap.to("#effort-title", { opacity:1, filter:"blur(0px)", duration:2, ease:"power2.out" }); }
+            }});
+        }
+
+        const bData = [{m:'I', c:'#ff4d6d'}, {m:'love', c:'#ff758c'}, {m:'you', c:'#ff8fa3'}, {m:'meri', c:'#ffb3c1'}, {m:'chamar', c:'#ffccd5'}];
+        let poppedCount = 0;
+        function buildBalloons() {
+            const container = document.getElementById('b-container'); container.innerHTML = '';
+            bData.forEach((b, index) => {
+                const bEl = document.createElement('div'); bEl.className = 'balloon'; bEl.innerText = '❤️';
+                bEl.style.color = b.c; bEl.style.setProperty('--ft', (Math.random() * 2 + 2) + 's');
+                bEl.onclick = () => {
+                    if(index === poppedCount) {
+                        confetti({ particleCount: 30, origin: { x: bEl.getBoundingClientRect().left/window.innerWidth, y: 0.6 } });
+                        bEl.onclick = null; bEl.style.animation = 'none';
+                        bEl.innerHTML = `<span class="revealed-text">${b.m}</span>`;
+                        poppedCount++;
+                        if(poppedCount === 5) document.getElementById('next2').style.display = 'inline-block';
+                    }
+                };
+                container.appendChild(bEl);
+            });
+        }
+
+        function triggerDecline(step) {
+            if(step === 1) { changePage(3); } 
+            else if(step === 2) {
+                document.getElementById('status-title').innerText = "Access Blocked";
+                document.getElementById('status-desc').innerText = "Security protocol locked. Use biometric scan.";
+                document.getElementById('action-area').innerHTML = `
+                    <div class="fp-container" id="biometric-pad" onmousedown="startScan()" onmouseup="endScan()" ontouchstart="startScan()" ontouchend="endScan()">✋</div>
+                    <p style="color:var(--gold); font-size:0.85rem; font-weight:600; margin-top:10px;">only meri chamar can enter</p>
+                `;
+            }
+        }
+
+        let scanTimeout;
+        function startScan() {
+            if (navigator.vibrate) navigator.vibrate(200);
+            scanTimeout = setTimeout(() => {
+                if (navigator.vibrate) navigator.vibrate([100, 50, 200]);
+                changePage(4);
+            }, 1500);
+        }
+        function endScan() { clearTimeout(scanTimeout); }
+
+        function handleDrawingClick() {
+            alert("Access Declined");
+            document.getElementById('drawShowBtn').style.display = 'none';
+            document.getElementById('please-input-area').style.display = 'block';
+            document.getElementById('please-text').focus();
+        }
+
+        function checkPleaseToken() {
+            const val = document.getElementById('please-text').value.trim().toLowerCase();
+            if(val === "please") {
+                document.getElementById('please-input-area').style.display = 'none';
+                const frame = document.getElementById('dFrame'); frame.style.display = 'block';
+                gsap.fromTo(frame, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 1, onComplete: () => {
+                    document.getElementById('next4').style.display = 'inline-block';
+                }});
+            } else {
+                document.getElementById('hint-msg').innerText = "Sahi se please bol! 😈";
+                if (navigator.vibrate) navigator.vibrate(100);
+            }
+        }
+
+        function openLetter() {
+            document.getElementById('env').classList.add('open-envelope');
+            setTimeout(() => {
+                document.getElementById('envelope-scene').style.display = 'none';
+                document.getElementById('letter-card').style.display = 'block';
+                startTyping();
+            }, 800);
+        }
+
+        function startTyping() {
+            const msg = `first of all I'm very sorry maine teri mental health barbad krdi.. ye website isliye hi banaya just to do something for you... I just wanted to do something for you after everything bhut royi h tu and just I want to make you smile you're my everything afterall \n\nso maine discuss kr hi liya hoga ab tak saudi jane vali chij ka jab mai ye website banara hu maine Tereko message nahi kra h nd I'm very very sorry... mai tere sath permanent na reh sakta destiny has planned something else for us ig we're not meant to be together .. i always loved u hadse jada you were my everything literally everything nd now I've to go.. I've to go ik tu jane na degi ik you but mai reh na sakta sathme.. i got responsibilities charu and ham sathme bhi na reh sakte so please let's end this on our good terms.. bhut roo chuki tu\n\nthis one last time just smile and say goodbye ash chamar .. maybe in another life ham sathme hoge ( sounds so cringe but ha ) socha nhi tha I'll let you go merese dur kabhi bhi but... I've to? ig? I'll always remember you.. and you were best har chij me starting to end.. thank you for everything literally everything har ek chij ke liye`;
+            let i = 0; const box = document.getElementById("type-box");
+            function type() {
+                if (i < msg.length) {
+                    if (msg.substring(i, i+2) === "\n\n") { box.innerHTML += "<br><br>"; i += 2; }
+                    else if (msg.charAt(i) === "\n") { box.innerHTML += "<br>"; i++; }
+                    else { box.innerHTML += msg.charAt(i); i++; }
+                    box.scrollTop = box.scrollHeight;
+                    setTimeout(type, 35);
+                } else document.getElementById("next5").style.display = "block";
+            }
+            type();
+        }
+
+        const canvas = document.getElementById('fw-canvas'); const ctx = canvas.getContext('2d');
+        let particles = []; let rockets = [];
+        function startFireworks() {
+            changePage(6); canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            requestAnimationFrame(updateFW);
+            setInterval(() => { rockets.push(new Rocket()); }, 700);
+            setTimeout(() => { gsap.to("#final-text", { opacity: 1, scale: 1.2, duration: 2.5 }); }, 3000);
+        }
+        document.getElementById('next5').addEventListener('click', startFireworks);
+
+        class Rocket {
+            constructor() { this.x = Math.random() * canvas.width; this.y = canvas.height; this.targetY = Math.random() * (canvas.height * 0.4); this.speed = 6.5; }
+            update() { this.y -= this.speed; if(this.y <= this.targetY) { explode(this.x, this.y); return false; } return true; }
+            draw() { ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(this.x, this.y, 2, 0, Math.PI*2); ctx.fill(); }
+        }
+        class Particle {
+            constructor(x, y, isHeart) {
+                this.x = x; this.y = y; this.isHeart = isHeart; this.angle = Math.random() * Math.PI * 2;
+                this.vel = Math.random() * (isHeart ? 3 : 5) + 2; this.alpha = 1; this.decay = Math.random() * 0.012 + 0.008; this.gravity = 0.1;
+            }
+            update() { this.x += Math.cos(this.angle) * this.vel; this.y += Math.sin(this.angle) * this.vel + this.gravity; this.alpha -= this.decay; return this.alpha > 0; }
+            draw() {
+                ctx.save(); ctx.globalAlpha = this.alpha; ctx.translate(this.x, this.y);
+                if(this.isHeart) {
+                    ctx.fillStyle = "#ff4d6d"; ctx.beginPath(); ctx.moveTo(0,0);
+                    ctx.bezierCurveTo(-5,-5,-10,5,0,10); ctx.bezierCurveTo(10,5,5,-5,0,0); ctx.fill();
+                } else {
+                    ctx.fillStyle = `hsl(${Math.random()*360}, 100%, 75%)`; ctx.beginPath(); ctx.arc(0,0,2,0,Math.PI*2); ctx.fill();
+                }
+                ctx.restore();
+            }
+        }
+        function explode(x, y) {
+            for(let i=0; i<45; i++) particles.push(new Particle(x, y, false));
+            for(let i=0; i<15; i++) particles.push(new Particle(x, y, true));
+        }
+        function updateFW() {
+            ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+            rockets = rockets.filter(r => { r.draw(); return r.update(); });
+            particles = particles.filter(p => { p.draw(); return p.update(); });
+            requestAnimationFrame(updateFW);
+        }
+    </script>
+</body>
+  </html>
+              
